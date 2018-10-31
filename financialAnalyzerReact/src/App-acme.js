@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Header, List, Segment, Grid, Rail } from 'semantic-ui-react'
+import { Container, Header, } from 'semantic-ui-react'
 import { Welcome, VehicleChoose, CarForm, BoatForm, BoatDetail, Confirm } from './Steps.js';
 import { states } from './States.js';
 import { StateMachine } from './StateMachine.js';
@@ -9,7 +9,6 @@ class App extends Component {
     super(props);
     this.state = {
       currentState: states.WELCOME,
-      currentStatePath: [states.WELCOME],
       vehicleType: null,
       vehicles: []
     };
@@ -30,20 +29,15 @@ class App extends Component {
   _next(desiredState) {
     let currentState = this.state.currentState;
     let nextState = this.stateMachine.transitionTo(currentState, desiredState);
-    let statePath = this.state.currentStatePath.slice(0);
-    statePath.push(nextState);
     this.setState({
-      currentState: nextState,
-      currentStatePath: statePath
+      currentState: nextState
     });
   }
 
   _back(desiredState) {
     let currentState = this.state.currentState;
-    let statePath = this.state.currentStatePath.slice(0, this.state.currentStatePath.length - 1);
     this.setState({
-      currentState: this.stateMachine.transitionFrom(currentState, desiredState),
-      currentStatePath: statePath
+      currentState: this.stateMachine.transitionFrom(currentState, desiredState)
     });
   }
 
@@ -86,26 +80,13 @@ class App extends Component {
     }
   }
   render() {
-    var stateItems = [];
-    for (let i = 0; i < this.state.currentStatePath.length; ++i) {
-        stateItems.push(<List.Item key={"state" + i}>{this.state.currentStatePath[i]}</List.Item>);
-    }
     return (
-      <Grid centered columns={2}>
-        <Grid.Column>
-            <Container text>
-              <Header as='h2'>Acme Insurance Quotes</Header>
-              <Rail position='left'>
-                  <Segment inverted>
-                      <List divided>
-                          {stateItems}
-                      </List>
-                  </Segment>
-              </Rail>
-              {this._currentStep()}
-            </Container>
-        </Grid.Column>
-      </Grid>
+      <div>
+        <Container text>
+          <Header as='h2'>Acme Insurance Quotes</Header>
+          {this._currentStep()}
+        </Container>
+      </div>
     );
   }
 }
