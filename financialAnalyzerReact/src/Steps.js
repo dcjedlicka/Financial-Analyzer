@@ -1,6 +1,95 @@
 import React, { Component } from 'react';
 import { Form, Button, Grid, Message, List } from 'semantic-ui-react';
 
+export class Intro extends Component {
+    constructor(props) {
+        super(props);
+    }
+      name() {
+          return "Intro";
+      }
+    
+    render() {
+        return(
+            <Grid>
+                <p>Welcome to the financial calculator!  Let's get started!</p>
+              <Grid.Column floated='right' width={5}>
+                <Button primary onClick={() => this.props.next()}>Next</Button>
+              </Grid.Column>
+            </Grid>
+        );
+    }
+}
+
+export class KidInfo extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      kidAge: null,
+      errors: []
+    };
+    this._validate = this._validate.bind(this);
+    this._onChange = this._onChange.bind(this);
+  }
+  name() {
+      return "Kid info";
+  }
+  _onChange(e, { value }) {
+      this.setState({
+          kidAge: value,
+          errors: []
+      });
+  }
+  _validate(e) {
+    e.preventDefault();
+    // You can add your validation logic here
+    let kidAge = parseInt(this.state.kidAge);
+    if (isNaN(kidAge)) {
+      this.setState({
+        errors: ['Not a number']
+      });
+      return;
+    }
+
+    //TODO set age
+    /*this.props.saveForm({
+      type: this.props.type,
+      make: this.state.make,
+      model: this.state.model,
+      year: this.state.year
+    });*/
+
+    this.props.next();
+  }
+ 
+  render() {
+      return(
+        <Form>
+            { this.state.errors.length > 0 &&
+            <Message negative>
+              <p>{this.state.errors.join('. ')}</p>
+            </Message>
+            }
+            <Form.Field>
+              <Form.Input 
+                name='kidAge'
+                value={this.state.kidAge}
+                onChange={this._onChange}
+                label='Age of my kid:'/>
+            </Form.Field>
+            <Grid>
+              <Grid.Column floated='left' width={5}>
+                <Button secondary onClick={this.props.back}>Back</Button>
+              </Grid.Column>
+              <Grid.Column floated='right' width={5}>
+                <Button primary onClick={this._validate}>Next</Button>
+              </Grid.Column>
+            </Grid>
+        </Form>
+      );
+  }
+
+}
 
 export class VehicleChoose extends Component {
   constructor(props) {
@@ -11,10 +100,6 @@ export class VehicleChoose extends Component {
     };
     this._onChange = this._onChange.bind(this);
     this._validate = this._validate.bind(this);
-  }
-  // Can use React.cloneElement() instead
-  clone(props) {
-      return new VehicleChoose(props);
   }
   name() {
       return "Choose vehicle";
@@ -85,9 +170,6 @@ export class BaseForm extends Component {
     this._onChange = this._onChange.bind(this);
     this._validate = this._validate.bind(this);
     this._back = this._back.bind(this);
-  }
-  clone(props) {
-      return new BaseForm(props);
   }
   name() {
       return "Vehicle details";
@@ -278,6 +360,8 @@ export class Confirm extends React.Component {
 }
     
 export const steps = [
+    new Intro({}),
+    new KidInfo({}),
     new VehicleChoose({}),
     new BaseForm({})
 ];

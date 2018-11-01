@@ -73,13 +73,14 @@ class App extends Component {
         else if (i > this.state.currentState) {
             itemClass = "state-future";
         }
+        //TODO - make clicking on it go to that state
         stateItems.push(<List.Item className={itemClass} key={"state" + i}>{steps[i].name()}</List.Item>);
     }
     return (
       <Grid centered columns={2}>
         <Grid.Column>
             <Container text>
-              <Header as='h2'>Acme Insurance Quotes</Header>
+              <Header as='h2'>Financial calculator</Header>
               <Rail position='left'>
                   <Segment>
                       <List divided>
