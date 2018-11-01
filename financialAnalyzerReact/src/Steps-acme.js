@@ -1,6 +1,25 @@
 import React, { Component } from 'react';
 import { Form, Button, Grid, Message, List } from 'semantic-ui-react';
+import { states } from './States.js';
 
+
+export const steps = [
+    new VehicleChoose({}),
+    new BaseForm({})
+];
+
+export const Welcome = (props) => {
+  return(
+    <Grid>
+      <p>Welcome to Acme Insurance! Lets get started</p>
+      <Grid.Column floated='left' width={5}>
+      </Grid.Column>
+      <Grid.Column floated='right' width={5}>
+        <Button primary onClick={() => props.next(states.VEHICLE_CHOOSE)}>Next</Button>
+      </Grid.Column>
+    </Grid>
+  );
+}
 
 export class VehicleChoose extends Component {
   constructor(props) {
@@ -12,12 +31,8 @@ export class VehicleChoose extends Component {
     this._onChange = this._onChange.bind(this);
     this._validate = this._validate.bind(this);
   }
-  // Can use React.cloneElement() instead
-  clone(props) {
+  static clone(props) {
       return new VehicleChoose(props);
-  }
-  name() {
-      return "Choose vehicle";
   }
 
   _onChange(e, { value }) {
@@ -30,11 +45,19 @@ export class VehicleChoose extends Component {
   _validate(e) {
     e.preventDefault();
     let value = this.state.value;
-    this.props.next();
+    if (value === 'car') {
+      this.props.next(states.CAR);
+    } else if (value === 'boat') {
+      this.props.next(states.BOAT);
+    } else {
+      this.setState({
+        errors: ['Please choose a vehicle type']
+      });
+    }
   }
 
   _back() {
-    this.props.back();
+    this.props.back(states.WELCOME)
   }
 
   render() {
@@ -71,7 +94,7 @@ export class VehicleChoose extends Component {
   }
 }
 
-export class BaseForm extends Component {
+class BaseForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -86,16 +109,13 @@ export class BaseForm extends Component {
     this._validate = this._validate.bind(this);
     this._back = this._back.bind(this);
   }
-  clone(props) {
+  static clone(props) {
       return new BaseForm(props);
-  }
-  name() {
-      return "Vehicle details";
   }
 
   _back(e) {
     e.preventDefault();
-    this.props.back();
+    this.props.back(states.VEHICLE_CHOOSE);
   }
 
   _onChange(e, { name, value }) {
@@ -176,7 +196,8 @@ export const BoatForm = (props) => {
       type='Boat'
       next={props.next}
       back={props.back}
-      saveForm={props.saveForm}/>
+      saveForm={props.saveForm}
+      nextState={states.BOAT_DETAIL}/>
   );
 }
 
@@ -186,7 +207,8 @@ export const CarForm = (props) => {
       type='Car'
       next={props.next}
       back={props.back}
-      saveForm={props.saveForm}/>
+      saveForm={props.saveForm}
+      nextState={states.CONFIRM}/>
   );
 }
 
@@ -203,7 +225,7 @@ export class BoatDetail extends Component {
 
   _validate(e) {
     // You can add validation logic here
-    this.props.next();
+    this.props.next(states.CONFIRM)
   }
 
   render() {
@@ -231,7 +253,7 @@ export class BoatDetail extends Component {
         </Form.Field>
         <Grid>
           <Grid.Column floated='left' width={5}>
-            <Button secondary onClick={() => this.props.back()}>Back</Button>
+            <Button secondary onClick={() => this.props.back(states.BOAT)}>Back</Button>
           </Grid.Column>
           <Grid.Column floated='right' width={5}>
             <Button primary onClick={this._validate}>Next</Button>
@@ -266,7 +288,7 @@ export class Confirm extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column floated='left' width={5}>
-            <Button onClick={() => this.props.next()}>Add Another</Button>
+            <Button onClick={() => this.props.next(states.VEHICLE_CHOOSE)}>Add Another</Button>
           </Grid.Column>
           <Grid.Column floated='right' width={5}>
             <Button primary onClick={() => alert('Finished!')}>Get quote</Button>
@@ -276,10 +298,3 @@ export class Confirm extends React.Component {
     );
   }
 }
-    
-export const steps = [
-    new VehicleChoose({}),
-    new BaseForm({})
-];
-
-

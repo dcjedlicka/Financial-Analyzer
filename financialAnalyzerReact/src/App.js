@@ -1,22 +1,18 @@
 import React, { Component } from 'react';
 import { Container, Header, List, Segment, Grid, Rail } from 'semantic-ui-react'
-import { Welcome, VehicleChoose, CarForm, BoatForm, BoatDetail, Confirm } from './Steps.js';
-import { states } from './States.js';
-import { StateMachine } from './StateMachine.js';
+import { steps, VehicleChoose, BaseForm } from './Steps.js';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentState: states.WELCOME,
-      currentStatePath: [states.WELCOME],
+      currentState: 0,
       vehicleType: null,
       vehicles: []
     };
     this._next = this._next.bind(this);
     this._back = this._back.bind(this);
     this._saveVehicle = this._saveVehicle.bind(this);
-    this.stateMachine = new StateMachine();
   }
 
   _saveVehicle(vehicle) {
@@ -29,21 +25,16 @@ class App extends Component {
 
   _next(desiredState) {
     let currentState = this.state.currentState;
-    let nextState = this.stateMachine.transitionTo(currentState, desiredState);
-    let statePath = this.state.currentStatePath.slice(0);
-    statePath.push(nextState);
+    let nextState = currentState + 1;
     this.setState({
       currentState: nextState,
-      currentStatePath: statePath
     });
   }
 
   _back(desiredState) {
     let currentState = this.state.currentState;
-    let statePath = this.state.currentStatePath.slice(0, this.state.currentStatePath.length - 1);
     this.setState({
-      currentState: this.stateMachine.transitionFrom(currentState, desiredState),
-      currentStatePath: statePath
+      currentState: currentState - 1
     });
   }
 
@@ -55,40 +46,34 @@ class App extends Component {
    * state.
    */
   _currentStep() {
-    switch(this.state.currentState) {
-      case states.WELCOME:
-        return(<Welcome next={this._next}/>);
-      case states.VEHICLE_CHOOSE:
-        return(<VehicleChoose 
-          back={this._back}
-          next={this._next}/>);
-      case states.CAR:
-        return(<CarForm 
-          saveForm={this._saveVehicle}
-          back={this._back}
-          next={this._next} />);
-      case states.BOAT:
-        return(<BoatForm 
-          saveForm={this._saveVehicle}
-          back={this._back}
-          next={this._next} />);
-      case states.BOAT_DETAIL:
-       return(<BoatDetail
-         back={this._back}
-         next={this._next} />);
-      case states.CONFIRM:
-        return(<Confirm
-          vehicles={this.state.vehicles}
-          back={this._back}
-          next={this._next} />);
-      default:
-        return(<Welcome next={this._next}/>);
+    let stepClass = steps[this.state.currentState];
+    let props = {};
+    if (this.state.currentState > 0) {
+        props.back = this._back;
     }
+    if (this.state.currentState < steps.length - 1) {
+        props.next = this._next;
+    }
+    return React.createElement(stepClass.constructor, props);
+    /*switch(this.state.currentState) {
+        case 0:
+            return <VehicleChoose next={this._next}/>;
+        case 1:
+            return <BaseForm back={this._back}/>;
+    }*/
   }
+
   render() {
-    var stateItems = [];
-    for (let i = 0; i < this.state.currentStatePath.length; ++i) {
-        stateItems.push(<List.Item key={"state" + i}>{this.state.currentStatePath[i]}</List.Item>);
+    let stateItems = [];
+    for (let i = 0; i < steps.length; ++i) {
+        let itemClass = "state-current";
+        if (i < this.state.currentState) {
+            itemClass = "state-past";
+        }
+        else if (i > this.state.currentState) {
+            itemClass = "state-future";
+        }
+        stateItems.push(<List.Item className={itemClass} key={"state" + i}>{steps[i].name()}</List.Item>);
     }
     return (
       <Grid centered columns={2}>
@@ -96,7 +81,7 @@ class App extends Component {
             <Container text>
               <Header as='h2'>Acme Insurance Quotes</Header>
               <Rail position='left'>
-                  <Segment inverted>
+                  <Segment>
                       <List divided>
                           {stateItems}
                       </List>
