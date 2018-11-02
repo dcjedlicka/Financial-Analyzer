@@ -99,7 +99,7 @@ export class ShowKidCollegeYear extends Component {
   render() {
     return(
       <div>
-        <p>Your kid is {this.props.kidAge} years old</p>
+        <p>Your kid is {this.props.kidAge} years old, and will attend college in <b>{this.props.getCollegeYear()}</b>.</p>
         <BackNextButtons back={this.props.back} next={this.props.next}/>
        </div>
     );
