@@ -39,11 +39,32 @@ export class Intro extends Component {
     }
 }
 
+class KidInfo extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            name: props.kidInfo.name,
+            age: props.kidInfo.age
+        };
+    }
+    render() {
+        //TODO onChange
+        return(
+            <Form.Group widths='equal'>
+                <Form.Field>
+                    <Form.Input name='name' value={this.state.name} label='Name'/>
+                    <Form.Input name='age' value={this.state.age} label='Age'/>
+                </Form.Field>
+            </Form.Group>
+        );
+    }
+}
+
 export class InputKidInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      kidAge: props.kidAge,
+      kidInfos: props.kidInfos,
       errors: []
     };
     this._validate = this._validate.bind(this);
@@ -54,22 +75,23 @@ export class InputKidInfo extends Component {
   }
   _onChange(e, { value }) {
       this.setState({
-          kidAge: value,
+          kidInfos: value,
           errors: []
       });
   }
   _validate(e) {
     e.preventDefault();
+    //TODO
     // Ugh, things like "1e" pass because of scientific notation
-    let kidAge = parseInt(this.state.kidAge, 10);
-    if (isNaN(kidAge)) {
+    //let kidAge = parseInt(this.state.kidAge, 10);
+    /*if (isNaN(kidAge)) {
       this.setState({
         errors: ['Not a number']
       });
       return;
     }
 
-    this.props.setKidAge(kidAge);
+    this.props.setKidInfos(kidInfos);*/
     this.props.next();
   }
  
@@ -77,13 +99,7 @@ export class InputKidInfo extends Component {
       return(
         <Form>
             <Errors errors={this.state.errors}/>
-            <Form.Field>
-              <Form.Input 
-                name='kidAge'
-                value={this.state.kidAge}
-                onChange={this._onChange}
-                label='Age of my kid:'/>
-            </Form.Field>
+            <KidInfo kidInfo={{name: '', age: 0}} />
             <BackNextButtons back={this.props.back} next={this._validate}/>
         </Form>
       );
@@ -99,7 +115,7 @@ export class ShowKidCollegeYear extends Component {
   render() {
     return(
       <div>
-        <p>Your kid is {this.props.kidAge} years old, and will attend college in <b>{this.props.getCollegeYear()}</b>.</p>
+        <p>Your kid is {this.props.kidInfos} years old, and will attend college in <b>{this.props.getCollegeYear()}</b>.</p>
         <BackNextButtons back={this.props.back} next={this.props.next}/>
        </div>
     );
