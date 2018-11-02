@@ -1,10 +1,30 @@
 import React, { Component } from 'react';
 import { Form, Button, Grid, Message, List } from 'semantic-ui-react';
 
-export class Intro extends Component {
-    constructor(props) {
-        super(props);
+class Errors extends Component {
+    render() {
+        return ( <div>{ this.props.errors && this.props.errors.length > 0 &&
+            <Message negative>
+              <p>{this.props.errors.join('. ')}</p>
+            </Message>
+            }</div>
+        );
     }
+}
+class BackNextButtons extends Component{
+    render() {
+        return ( <Grid>
+                {this.props.back && <Grid.Column floated='left' width={5}>
+            <Button secondary onClick={this.props.back}>Back</Button>
+          </Grid.Column> }
+          { this.props.next && <Grid.Column floated='right' width={5}>
+            <Button primary onClick={this.props.next}>Next</Button>
+          </Grid.Column> }
+        </Grid>);
+    }
+}
+
+export class Intro extends Component {
       name() {
           return "Intro";
       }
@@ -13,19 +33,17 @@ export class Intro extends Component {
         return(
             <Grid>
                 <p>Welcome to the financial calculator!  Let's get started!</p>
-              <Grid.Column floated='right' width={5}>
-                <Button primary onClick={() => this.props.next()}>Next</Button>
-              </Grid.Column>
+                <BackNextButtons back={this.props.back} next={this.props.next}/>
             </Grid>
         );
     }
 }
 
-export class KidInfo extends Component {
+export class InputKidInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      kidAge: null,
+      kidAge: props.kidAge,
       errors: []
     };
     this._validate = this._validate.bind(this);
@@ -42,8 +60,8 @@ export class KidInfo extends Component {
   }
   _validate(e) {
     e.preventDefault();
-    // You can add your validation logic here
-    let kidAge = parseInt(this.state.kidAge);
+    // Ugh, things like "1e" pass because of scientific notation
+    let kidAge = parseInt(this.state.kidAge, 10);
     if (isNaN(kidAge)) {
       this.setState({
         errors: ['Not a number']
@@ -51,25 +69,14 @@ export class KidInfo extends Component {
       return;
     }
 
-    //TODO set age
-    /*this.props.saveForm({
-      type: this.props.type,
-      make: this.state.make,
-      model: this.state.model,
-      year: this.state.year
-    });*/
-
+    this.props.setKidAge(kidAge);
     this.props.next();
   }
  
   render() {
       return(
         <Form>
-            { this.state.errors.length > 0 &&
-            <Message negative>
-              <p>{this.state.errors.join('. ')}</p>
-            </Message>
-            }
+            <Errors errors={this.state.errors}/>
             <Form.Field>
               <Form.Input 
                 name='kidAge'
@@ -77,81 +84,24 @@ export class KidInfo extends Component {
                 onChange={this._onChange}
                 label='Age of my kid:'/>
             </Form.Field>
-            <Grid>
-              <Grid.Column floated='left' width={5}>
-                <Button secondary onClick={this.props.back}>Back</Button>
-              </Grid.Column>
-              <Grid.Column floated='right' width={5}>
-                <Button primary onClick={this._validate}>Next</Button>
-              </Grid.Column>
-            </Grid>
+            <BackNextButtons back={this.props.back} next={this._validate}/>
         </Form>
       );
   }
 
 }
 
-export class VehicleChoose extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: null,
-      errors: []
-    };
-    this._onChange = this._onChange.bind(this);
-    this._validate = this._validate.bind(this);
-  }
+export class ShowKidCollegeYear extends Component {
   name() {
-      return "Choose vehicle";
-  }
-
-  _onChange(e, { value }) {
-    this.setState({ 
-      value: value,
-      errors: []
-    });
-  }
-
-  _validate(e) {
-    e.preventDefault();
-    let value = this.state.value;
-    this.props.next();
-  }
-
-  _back() {
-    this.props.back();
+      return "College year";
   }
 
   render() {
     return(
-      <Form>
-        { this.state.errors.length > 0 &&
-        <Message negative>
-          <p>{this.state.errors.join('. ')}</p>
-        </Message>
-        }
-        <Form.Field>
-          <label>I am insuring:</label>
-          <Form.Radio 
-            label='A boat' 
-            value='boat'
-            checked={this.state.value === 'boat'}
-            onChange={this._onChange}/>
-          <Form.Radio 
-            label='A car' 
-            value='car'
-            checked={this.state.value === 'car'}
-            onChange={this._onChange}/>
-        </Form.Field>
-        <Grid>
-          <Grid.Column floated='left' width={5}>
-            <Button secondary onClick={this._back}>Back</Button>
-          </Grid.Column>
-          <Grid.Column floated='right' width={5}>
-            <Button primary onClick={this._validate}>Next</Button>
-          </Grid.Column>
-        </Grid>
-       </Form>
+      <div>
+        <p>Your kid is {this.props.kidAge} years old</p>
+        <BackNextButtons back={this.props.back} next={this.props.next}/>
+       </div>
     );
   }
 }
@@ -361,8 +311,8 @@ export class Confirm extends React.Component {
     
 export const steps = [
     new Intro({}),
-    new KidInfo({}),
-    new VehicleChoose({}),
+    new InputKidInfo({}),
+    new ShowKidCollegeYear({}),
     new BaseForm({})
 ];
 

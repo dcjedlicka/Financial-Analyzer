@@ -18,18 +18,21 @@
   color: white;
 }
 
-.state-current {
+.state-current, .state-past, .state-future {
     background-color: black;
     color: white;
 }
-.state-past {
+.state-future {
+    opacity: 0.5;
+}
+/*.state-past {
     background-color: blue;
     color: gray;
 }
 .state-future {
     background-color: green;
     color: gray;
-}
+}*/
 
 .App-link {
   color: #61dafb;
