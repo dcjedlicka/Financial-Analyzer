@@ -70,14 +70,14 @@ class App extends Component {
     let stateItems = [];
     for (let i = 0; i < steps.length; ++i) {
         let itemClass = "state-current";
-        let icon = <Icon color='white' name='map marker'/>
+        let icon = <Icon color='white' name='circle'/>;
         if (i < this.state.currentState) {
             itemClass = "state-past";
-            icon = <Icon color='green' name='check circle'/>
+            icon = <Icon color='green' name='check circle'/>;
         }
         else if (i > this.state.currentState) {
             itemClass = "state-future";
-        let icon = <Icon color='gray' name='map marker'/>
+            let icon = <Icon color='gray' name='circle'/>;
         }
         //TODO - make clicking on it go to that state
         stateItems.push(<List.Item className={itemClass} key={"state" + i}>{icon} {steps[i].name()}</List.Item>);
