@@ -7,6 +7,7 @@ class App extends Component {
     super(props);
     this.state = {
       currentState: 0,
+      kidInfos: [],
       vehicleType: null,
       vehicles: []
     };

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Button, Grid, Message, List } from 'semantic-ui-react';
+import { Form, Button, Grid, Message, List, Icon } from 'semantic-ui-react';
 
 class Errors extends Component {
     render() {
@@ -43,18 +43,57 @@ class KidInfo extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: props.kidInfo.name,
-            age: props.kidInfo.age
+            name: props.name,
+            age: props.age
         };
+        this._onChange = this._onChange.bind(this);
+        this._validate = this._validate.bind(this);
+    }
+    _onChange(e, {name, value}) {
+        //TODO - more granular error clearing?
+        this.setState({
+            [name]: value,
+            errors: []
+        });
+    }
+    _validate() {
+        let anyErrors = false;
+        if (this.state.name.trim() === '') {
+            anyErrors = true;
+            this.setState((state, props) => {
+                let newErrors = state.errors.slice(0);
+                newErrors.push('Name cannot be empty');
+                return {errors: newErrors};
+            });
+        }
+        // TODO Ugh, things like "1e" pass because of scientific notation
+        let kidAge = parseInt(this.state.age, 10);
+        if (isNaN(kidAge)) {
+            anyErrors = true;
+            this.setState((state, props) => {
+                let newErrors = state.errors.slice(0);
+                newErrors.push('Age must be a number');
+                return {errors: newErrors};
+            });
+        }
+        else if (kidAge < 0) {
+            anyErrors = true;
+            this.setState((state, props) => {
+                let newErrors = state.errors.slice(0);
+                newErrors.push('Age cannot be negative');
+                return {errors: newErrors};
+            });
+        }
+        return anyErrors;
     }
     render() {
-        //TODO onChange
         return(
-            <Form.Group widths='equal'>
-                <Form.Field>
-                    <Form.Input name='name' value={this.state.name} label='Name'/>
-                    <Form.Input name='age' value={this.state.age} label='Age'/>
-                </Form.Field>
+            <Form.Group>
+                <Button icon width={2}>
+                    <Icon name='delete' color='red'/>
+                </Button>
+                <Form.Input name='name' value={this.state.name} onChange={this._onChange} label='Name' width={6}/>
+                <Form.Input name='age' value={this.state.age} onChange={this._onChange} label='Age' width={6}/>
             </Form.Group>
         );
     }
@@ -68,20 +107,31 @@ export class InputKidInfo extends Component {
       errors: []
     };
     this._validate = this._validate.bind(this);
-    this._onChange = this._onChange.bind(this);
+    //this._onChange = this._onChange.bind(this);
+    this._addKid = this._addKid.bind(this);
   }
   name() {
       return "Kid info";
   }
-  _onChange(e, { value }) {
+  /*_onChange(e, { value }) {
       this.setState({
           kidInfos: value,
           errors: []
       });
+  }*/
+  _addKid() {
+      this.setState((state, props) => {
+          let newKidInfos = state.kidInfos.slice(0);
+          newKidInfos.push({name: '', age: 0});
+          return {kidInfos: newKidInfos};
+      });
   }
   _validate(e) {
     e.preventDefault();
-    //TODO
+    //TODO - can we ask the subcomponents to validate?
+    //use refs - see https://reactjs.org/docs/refs-and-the-dom.html#the-ref-string-attribute
+    //TODO - state needs to live above, should always be setting?
+ 
     // Ugh, things like "1e" pass because of scientific notation
     //let kidAge = parseInt(this.state.kidAge, 10);
     /*if (isNaN(kidAge)) {
@@ -99,7 +149,12 @@ export class InputKidInfo extends Component {
       return(
         <Form>
             <Errors errors={this.state.errors}/>
-            <KidInfo kidInfo={{name: '', age: 0}} />
+            {this.state.kidInfos.map((kidInfo, index) => 
+                    <KidInfo key={index} name={kidInfo.name} age={kidInfo.age}/>
+                )}
+            <Button icon onClick={this._addKid}>
+                <Icon name='add' color='green'/>
+            </Button>
             <BackNextButtons back={this.props.back} next={this._validate}/>
         </Form>
       );
