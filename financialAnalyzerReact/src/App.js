@@ -30,12 +30,12 @@ class App extends Component {
       this.setState({
           kidInfos: kidInfos
       });
+      this.forceUpdate();
   }
 
-  getCollegeYear() {
+  getCollegeYear(kidInfo) {
     let thisYear = (new Date()).getFullYear();
-    //return thisYear - this.state.kidAge + 18;
-    return 0;
+    return thisYear - kidInfo.age + 18;
   }
 
   _next(desiredState) {

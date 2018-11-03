@@ -51,10 +51,13 @@ class KidInfo extends Component {
     }
     _onChange(e, {name, value}) {
         //TODO - more granular error clearing?
-        this.setState({
+        let newKidInfo = {name: this.props.name, age: this.props.age};
+        Object.assign(newKidInfo, {[name]: value});
+        this.props.updateKidInfo(newKidInfo);
+        /*this.setState({
             [name]: value,
             errors: []
-        });
+        });*/
     }
     _validate() {
         let anyErrors = false;
@@ -89,11 +92,11 @@ class KidInfo extends Component {
     render() {
         return(
             <Form.Group>
-                <Button icon width={2}>
+                <Button icon width={2} onClick={this.props.deleteKid}>
                     <Icon name='delete' color='red'/>
                 </Button>
-                <Form.Input name='name' value={this.state.name} onChange={this._onChange} label='Name' width={6}/>
-                <Form.Input name='age' value={this.state.age} onChange={this._onChange} label='Age' width={6}/>
+                <Form.Input name='name' value={this.props.name} onChange={this._onChange} label='Name' width={6}/>
+                <Form.Input name='age' value={this.props.age} onChange={this._onChange} label='Age' width={6}/>
             </Form.Group>
         );
     }
@@ -103,12 +106,13 @@ export class InputKidInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      kidInfos: props.kidInfos,
       errors: []
     };
     this._validate = this._validate.bind(this);
     //this._onChange = this._onChange.bind(this);
     this._addKid = this._addKid.bind(this);
+    this._updateKidInfo = this._updateKidInfo.bind(this);
+    this._deleteKid = this._deleteKid.bind(this);
   }
   name() {
       return "Kid info";
@@ -120,11 +124,14 @@ export class InputKidInfo extends Component {
       });
   }*/
   _addKid() {
-      this.setState((state, props) => {
-          let newKidInfos = state.kidInfos.slice(0);
+      let newKidInfos = this.props.kidInfos.slice(0);
+      newKidInfos.push({name: '', age: 0});
+      this.props.setKidInfos(newKidInfos);
+      /*this.setState((state, props) => {
+          let newKidInfos = props.kidInfos.slice(0);
           newKidInfos.push({name: '', age: 0});
           return {kidInfos: newKidInfos};
-      });
+      });*/
   }
   _validate(e) {
     e.preventDefault();
@@ -144,13 +151,28 @@ export class InputKidInfo extends Component {
     this.props.setKidInfos(kidInfos);*/
     this.props.next();
   }
+  _updateKidInfo(index) {
+      return (newKidInfo) => {
+          let newKidInfos = this.props.kidInfos.slice(0);
+          newKidInfos[index] = newKidInfo;
+          this.props.setKidInfos(newKidInfos);
+      };
+  }
+
+   _deleteKid(index) {
+      return (newKidInfo) => {
+          let newKidInfos = this.props.kidInfos.slice(0);
+          newKidInfos.splice(index, 1);
+          this.props.setKidInfos(newKidInfos);
+      };
+  }
  
   render() {
       return(
         <Form>
             <Errors errors={this.state.errors}/>
-            {this.state.kidInfos.map((kidInfo, index) => 
-                    <KidInfo key={index} name={kidInfo.name} age={kidInfo.age}/>
+            {this.props.kidInfos.map((kidInfo, index) => 
+                    <KidInfo key={index} name={kidInfo.name} age={kidInfo.age} updateKidInfo={this._updateKidInfo(index)} deleteKid={this._deleteKid(index)}/>
                 )}
             <Button icon onClick={this._addKid}>
                 <Icon name='add' color='green'/>
@@ -170,7 +192,9 @@ export class ShowKidCollegeYear extends Component {
   render() {
     return(
       <div>
-        <p>Your kid is {this.props.kidInfos} years old, and will attend college in <b>{this.props.getCollegeYear()}</b>.</p>
+        {this.props.kidInfos.map((kidInfo) => 
+            <p>{kidInfo.name} is {kidInfo.age} years old, and will attend college in <b>{this.props.getCollegeYear(kidInfo)}</b>.</p>
+        )}
         <BackNextButtons back={this.props.back} next={this.props.next}/>
        </div>
     );
