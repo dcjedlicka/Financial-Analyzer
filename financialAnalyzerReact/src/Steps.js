@@ -59,6 +59,7 @@ class KidInfo extends Component {
             errors: []
         });*/
     }
+    //TODO remove
     _validate() {
         let anyErrors = false;
         if (this.state.name.trim() === '') {
@@ -90,13 +91,15 @@ class KidInfo extends Component {
         return anyErrors;
     }
     render() {
+        let hasNameError = this.props.errors && this.props.errors.get('name') !== undefined;
+        let hasAgeError = this.props.errors && this.props.errors.get('age') !== undefined;
         return(
             <Form.Group>
                 <Button icon width={2} onClick={this.props.deleteKid}>
                     <Icon name='delete' color='red'/>
                 </Button>
-                <Form.Input name='name' value={this.props.name} onChange={this._onChange} label='Name' width={6}/>
-                <Form.Input name='age' value={this.props.age} onChange={this._onChange} label='Age' width={6}/>
+                <Form.Input name='name' error={hasNameError} value={this.props.name} onChange={this._onChange} label='Name' width={6}/>
+                <Form.Input name='age' error={hasAgeError} value={this.props.age} onChange={this._onChange} label='Age' width={6}/>
             </Form.Group>
         );
     }
@@ -139,16 +142,6 @@ export class InputKidInfo extends Component {
     //use refs - see https://reactjs.org/docs/refs-and-the-dom.html#the-ref-string-attribute
     //TODO - state needs to live above, should always be setting?
  
-    // Ugh, things like "1e" pass because of scientific notation
-    //let kidAge = parseInt(this.state.kidAge, 10);
-    /*if (isNaN(kidAge)) {
-      this.setState({
-        errors: ['Not a number']
-      });
-      return;
-    }
-
-    this.props.setKidInfos(kidInfos);*/
     this.props.next();
   }
   _updateKidInfo(index) {
@@ -159,7 +152,7 @@ export class InputKidInfo extends Component {
       };
   }
 
-   _deleteKid(index) {
+  _deleteKid(index) {
       return (newKidInfo) => {
           let newKidInfos = this.props.kidInfos.slice(0);
           newKidInfos.splice(index, 1);
@@ -168,11 +161,22 @@ export class InputKidInfo extends Component {
   }
  
   render() {
+      //TODO tighten this up
+      let errors = [];
+      if (this.props.validationErrors) {
+         this.props.validationErrors.forEach((mapPerKidInfo) => {
+             if (mapPerKidInfo) {
+                 mapPerKidInfo.forEach((individualError) => {
+                     errors.push(individualError);
+                 });
+             }
+         });
+      }
       return(
         <Form>
-            <Errors errors={this.state.errors}/>
+            <Errors errors={errors}/>
             {this.props.kidInfos.map((kidInfo, index) => 
-                    <KidInfo key={index} name={kidInfo.name} age={kidInfo.age} updateKidInfo={this._updateKidInfo(index)} deleteKid={this._deleteKid(index)}/>
+                    <KidInfo key={index} name={kidInfo.name} age={kidInfo.age} errors={this.props.validationErrors.get(index)} updateKidInfo={this._updateKidInfo(index)} deleteKid={this._deleteKid(index)}/>
                 )}
             <Button icon onClick={this._addKid}>
                 <Icon name='add' color='green'/>
@@ -192,8 +196,8 @@ export class ShowKidCollegeYear extends Component {
   render() {
     return(
       <div>
-        {this.props.kidInfos.map((kidInfo) => 
-            <p>{kidInfo.name} is {kidInfo.age} years old, and will attend college in <b>{this.props.getCollegeYear(kidInfo)}</b>.</p>
+        {this.props.kidInfos.map((kidInfo, index) => 
+            <p key={index}>{kidInfo.name} is {kidInfo.age} years old, and will attend college in <b>{this.props.getCollegeYear(kidInfo)}</b>.</p>
         )}
         <BackNextButtons back={this.props.back} next={this.props.next}/>
        </div>
