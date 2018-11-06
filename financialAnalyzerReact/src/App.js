@@ -119,7 +119,6 @@ class App extends Component {
         let as = '';
         let thisIndex = i;
         let linkFunc = () => { this._setCurrentStep(thisIndex); };
-        //TODO - really tricky to do this right with steps[i].constructor, abstract this maybe?
         let errorsMap = this.state.validationErrors.get(steps[i].constructor);
         let hasErrors = errorsMap && errorsMap.size > 0;
         if (i < this.state.currentStep) {

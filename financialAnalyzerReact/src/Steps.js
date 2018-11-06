@@ -54,41 +54,6 @@ class KidInfo extends Component {
         let newKidInfo = {name: this.props.name, age: this.props.age};
         Object.assign(newKidInfo, {[name]: value});
         this.props.updateKidInfo(newKidInfo);
-        /*this.setState({
-            [name]: value,
-            errors: []
-        });*/
-    }
-    //TODO remove
-    _validate() {
-        let anyErrors = false;
-        if (this.state.name.trim() === '') {
-            anyErrors = true;
-            this.setState((state, props) => {
-                let newErrors = state.errors.slice(0);
-                newErrors.push('Name cannot be empty');
-                return {errors: newErrors};
-            });
-        }
-        // TODO Ugh, things like "1e" pass because of scientific notation
-        let kidAge = parseInt(this.state.age, 10);
-        if (isNaN(kidAge)) {
-            anyErrors = true;
-            this.setState((state, props) => {
-                let newErrors = state.errors.slice(0);
-                newErrors.push('Age must be a number');
-                return {errors: newErrors};
-            });
-        }
-        else if (kidAge < 0) {
-            anyErrors = true;
-            this.setState((state, props) => {
-                let newErrors = state.errors.slice(0);
-                newErrors.push('Age cannot be negative');
-                return {errors: newErrors};
-            });
-        }
-        return anyErrors;
     }
     render() {
         let hasNameError = this.props.errors && this.props.errors.get('name') !== undefined;
@@ -111,8 +76,6 @@ export class InputKidInfo extends Component {
     this.state = {
       errors: []
     };
-    this._validate = this._validate.bind(this);
-    //this._onChange = this._onChange.bind(this);
     this._addKid = this._addKid.bind(this);
     this._updateKidInfo = this._updateKidInfo.bind(this);
     this._deleteKid = this._deleteKid.bind(this);
@@ -120,29 +83,10 @@ export class InputKidInfo extends Component {
   name() {
       return "Kid info";
   }
-  /*_onChange(e, { value }) {
-      this.setState({
-          kidInfos: value,
-          errors: []
-      });
-  }*/
   _addKid() {
       let newKidInfos = this.props.kidInfos.slice(0);
       newKidInfos.push({name: '', age: 0});
       this.props.setKidInfos(newKidInfos);
-      /*this.setState((state, props) => {
-          let newKidInfos = props.kidInfos.slice(0);
-          newKidInfos.push({name: '', age: 0});
-          return {kidInfos: newKidInfos};
-      });*/
-  }
-  _validate(e) {
-    e.preventDefault();
-    //TODO - can we ask the subcomponents to validate?
-    //use refs - see https://reactjs.org/docs/refs-and-the-dom.html#the-ref-string-attribute
-    //TODO - state needs to live above, should always be setting?
- 
-    this.props.next();
   }
   _updateKidInfo(index) {
       return (newKidInfo) => {
@@ -181,7 +125,7 @@ export class InputKidInfo extends Component {
             <Button icon onClick={this._addKid}>
                 <Icon name='add' color='green'/>
             </Button>
-            <BackNextButtons back={this.props.back} next={this._validate}/>
+            <BackNextButtons back={this.props.back} next={this.props.next}/>
         </Form>
       );
   }
