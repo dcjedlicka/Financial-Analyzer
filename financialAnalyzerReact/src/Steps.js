@@ -47,10 +47,8 @@ class KidInfo extends Component {
             age: props.age
         };
         this._onChange = this._onChange.bind(this);
-        this._validate = this._validate.bind(this);
     }
     _onChange(e, {name, value}) {
-        //TODO - more granular error clearing?
         let newKidInfo = {name: this.props.name, age: this.props.age};
         Object.assign(newKidInfo, {[name]: value});
         this.props.updateKidInfo(newKidInfo);
@@ -105,7 +103,6 @@ export class InputKidInfo extends Component {
   }
  
   render() {
-      //TODO tighten this up
       let errors = [];
       if (this.props.validationErrors) {
          this.props.validationErrors.forEach((mapPerKidInfo) => {
@@ -118,6 +115,7 @@ export class InputKidInfo extends Component {
       }
       return(
         <Form>
+            <h1>Kid info</h1>
             <Errors errors={errors}/>
             {this.props.kidInfos.map((kidInfo, index) => 
                     <KidInfo key={index} name={kidInfo.name} age={kidInfo.age} errors={this.props.validationErrors.get(index)} updateKidInfo={this._updateKidInfo(index)} deleteKid={this._deleteKid(index)}/>
@@ -143,6 +141,7 @@ export class ShowKidCollegeYear extends Component {
         {this.props.kidInfos.map((kidInfo, index) => 
             <p key={index}>{kidInfo.name} is {kidInfo.age} years old, and will attend college in <b>{this.props.getCollegeYear(kidInfo)}</b>.</p>
         )}
+        {this.props.kidInfos.length === 0 && <p>You have no children.</p>}
         <BackNextButtons back={this.props.back} next={this.props.next}/>
        </div>
     );

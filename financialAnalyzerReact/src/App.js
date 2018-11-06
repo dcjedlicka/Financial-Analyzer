@@ -114,13 +114,16 @@ class App extends Component {
     let stateItems = [];
     for (let i = 0; i < steps.length; ++i) {
         let itemClass = "state-current";
-        let icon = <Icon name='circle'/>;
         let active = true;
         let as = '';
         let thisIndex = i;
         let linkFunc = () => { this._setCurrentStep(thisIndex); };
         let errorsMap = this.state.validationErrors.get(steps[i].constructor);
         let hasErrors = errorsMap && errorsMap.size > 0;
+        let icon = <Icon name='circle'/>;
+        if (hasErrors) {
+            icon = <Icon name='exclamation circle' color='yellow'/>;
+        }
         if (i < this.state.currentStep) {
             itemClass = "state-past";
             let iconName = 'check circle';
