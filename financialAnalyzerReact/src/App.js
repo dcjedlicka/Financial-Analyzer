@@ -89,13 +89,13 @@ class App extends Component {
         props.next = this._next;
     }
     let stepType = stepClass.constructor;
+    props.validationErrors = this.state.validationErrors.get(stepType);
     // Pass extra parameters here
     if (stepType === InputKidInfo) {
         props.setKidInfos = this._setKidInfos;
         props.kidInfos = this.state.kidInfos;
-        props.validationErrors = this.state.validationErrors.get(InputKidInfo);
     }
-    if (stepType === ShowKidCollegeYear) {
+    else if (stepType === ShowKidCollegeYear) {
         props.kidInfos = this.state.kidInfos;
         props.collegeYear = this.state.collegeYear;
         props.getCollegeYear = this.getCollegeYear;
