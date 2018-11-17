@@ -9,7 +9,6 @@ class App extends Component {
       currentStep: 0,
       maxStep: 0,
       kidInfos: [],
-      vehicleType: null,
       validationErrors: new Map(),
       vehicles: []
     };
