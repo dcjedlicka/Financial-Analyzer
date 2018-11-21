@@ -48,6 +48,18 @@ class App extends Component {
             else if (kidAge < 0) {
                 error.set('age', "Age cannot be negative");
             }
+            let yearStartingCollege = kidInfos[i].yearStartingCollege;
+            let yearStartingCollegeAsInt = parseInt(yearStartingCollege, 10);
+            let currentYear = (new Date()).getFullYear();
+            if (isNaN(yearStartingCollegeAsInt)) {
+                error.set('yearStartingCollege', "Year Starting College must be a number");
+            }
+            else if (yearStartingCollegeAsInt <= currentYear) {
+                error.set('yearStartingCollege', "Year Starting College must be in the future");
+            }
+            else if (yearStartingCollegeAsInt > 2050) {
+                error.set('yearStartingCollege', "Year Starting College must be before 2050");
+            }
             if (error.size > 0) {
                 errors.set(i, error);
             }

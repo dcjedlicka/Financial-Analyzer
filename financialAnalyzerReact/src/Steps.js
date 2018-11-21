@@ -44,25 +44,45 @@ class KidInfo extends Component {
         super(props);
         this.state = {
             name: props.name,
-            age: props.age
+            age: props.age,
+            yearStartingCollege: props.yearStartingCollege
         };
-        this._onChange = this._onChange.bind(this);
+        this._onChangeName = this._onChangeName.bind(this);
+        this._onChangeAge = this._onChangeAge.bind(this);
+        this._onChangeYearStartingCollege = this._onChangeYearStartingCollege.bind(this);
+        this._getCollegeYearFromAge = this._getCollegeYearFromAge.bind(this);
     }
-    _onChange(e, {name, value}) {
-        let newKidInfo = {name: this.props.name, age: this.props.age};
-        Object.assign(newKidInfo, {[name]: value});
+    _onChangeName(e, { name, value }) {
+        let newKidInfo = { name: this.props.name, age: this.props.age, yearStartingCollege: this.props.yearStartingCollege };
+        Object.assign(newKidInfo, { [name]: value });
+        this.props.updateKidInfo(newKidInfo);
+    }
+    _onChangeAge(e, { name, value }) {
+        let newKidInfo = { name: this.props.name, age: this.props.age, yearStartingCollege: this._getCollegeYearFromAge(value) };
+        Object.assign(newKidInfo, { [name]: value });
+        this.props.updateKidInfo(newKidInfo);
+    }
+    _getCollegeYearFromAge(kidAge) {
+        let thisYear = (new Date()).getFullYear();
+        return thisYear - kidAge + 18;
+    }
+    _onChangeYearStartingCollege(e, { name, value }) {
+        let newKidInfo = { name: this.props.name, age: this.props.age, yearStartingCollege: this.props.yearStartingCollege };
+        Object.assign(newKidInfo, { [name]: value });
         this.props.updateKidInfo(newKidInfo);
     }
     render() {
         let hasNameError = this.props.errors && this.props.errors.get('name') !== undefined;
         let hasAgeError = this.props.errors && this.props.errors.get('age') !== undefined;
+        let hasYearStartingCollegeError = this.props.errors && this.props.errors.get('yearStartingCollege') !== undefined;
         return(
             <Form.Group>
                 <Button icon width={2} onClick={this.props.deleteKid}>
                     <Icon name='delete' color='red'/>
                 </Button>
-                <Form.Input name='name' error={hasNameError} value={this.props.name} onChange={this._onChange} label='Name' width={6}/>
-                <Form.Input name='age' error={hasAgeError} value={this.props.age} onChange={this._onChange} label='Age' width={6}/>
+                <Form.Input name='name' error={hasNameError} value={this.props.name} onChange={this._onChangeName} label='Name' width={6}/>
+                <Form.Input name='age' error={hasAgeError} value={this.props.age} onChange={this._onChangeAge} label='Age' width={6} />
+                <Form.Input name='yearStartingCollege' error={hasYearStartingCollegeError} value={this.props.yearStartingCollege} onChange={this._onChangeYearStartingCollege} label='Year Starting College' width={6} />
             </Form.Group>
         );
     }
@@ -83,7 +103,8 @@ export class InputKidInfo extends Component {
   }
   _addKid() {
       let newKidInfos = this.props.kidInfos.slice(0);
-      newKidInfos.push({name: '', age: 0});
+      let initialYearStartingCollege = (new Date()).getFullYear() + 18;
+      newKidInfos.push({ name: '', age: 0, yearStartingCollege: initialYearStartingCollege });
       this.props.setKidInfos(newKidInfos);
   }
   _updateKidInfo(index) {
@@ -117,8 +138,8 @@ export class InputKidInfo extends Component {
         <Form>
             <h1>Kid info</h1>
             <Errors errors={errors}/>
-            {this.props.kidInfos.map((kidInfo, index) => 
-                    <KidInfo key={index} name={kidInfo.name} age={kidInfo.age} errors={this.props.validationErrors.get(index)} updateKidInfo={this._updateKidInfo(index)} deleteKid={this._deleteKid(index)}/>
+              {this.props.kidInfos.map((kidInfo, index) =>
+                  <KidInfo key={index} name={kidInfo.name} age={kidInfo.age} yearStartingCollege={kidInfo.yearStartingCollege} errors={this.props.validationErrors.get(index)} updateKidInfo={this._updateKidInfo(index)} deleteKid={this._deleteKid(index)} />
                 )}
             <Button icon onClick={this._addKid}>
                 <Icon name='add' color='green'/>
